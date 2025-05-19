@@ -27,7 +27,7 @@ public class GameView {
     private int[] selectedBoardPos;
     private int[] selectedPiecePos;
 
-    // private Map<String, JLabel> pieceObjects = new HashMap<String, JLabel>(); // 用于移动棋子
+    private ClockPanel clock;
 
     /**
      * 初始化GUI棋盘
@@ -68,7 +68,7 @@ public class GameView {
         this.board = player ? newBoard : flipBoard(newBoard);
         this.player = nextPlayer;
 
-        for (java.awt.Component c : pane.getComponents()) {
+        for (java.awt.Component c : pane.getComponents()) { // 清除需要变动的图层
             if (pane.getLayer(c) == 0) {
                 pane.remove(c);
             }
@@ -82,17 +82,25 @@ public class GameView {
 
         selectedPiecePos = null; // 清除旧的选中状态
         selectedBoardPos = null;
+
+        clock.resetTurn(); // 换手后读秒归 60
     }
 
 
     /**
-     * 初始化两个玩家头像，此后该图层不再改动
+     * 初始化两个玩家头像，深色木板总体背景，倒计时时钟；此后该图层不再改动
      */
     private void initAvatarLayer() {
         // 整个游戏背景
         JLabel bg = new JLabel(new ImageIcon("img/bg.png"));
-        bg.setBounds(0, 0, VIEW_WIDTH, VIEW_HEIGHT);   // ← 关键：给它占满整个窗口
+        bg.setBounds(0, 0, VIEW_WIDTH, VIEW_HEIGHT);   // 它占满整个窗口
         pane.add(bg, Integer.valueOf(-3));
+
+        // 倒计时时钟
+        int w = 110, h = 40;
+        clock = new ClockPanel(/*整盘秒数*/ 20*60, /*回合秒数*/ 60);
+        clock.setBounds((VIEW_WIDTH - w) / 2, 5, w, h);   // 顶部中间
+        pane.add(clock, Integer.valueOf(1));  // layer 1，永不刷新
 
         // 左上角头像
         JLabel avatarTL = player ? new JLabel(new ImageIcon("img/avatar_black.png")) : new JLabel(new ImageIcon("img/avatar_red.png"));
